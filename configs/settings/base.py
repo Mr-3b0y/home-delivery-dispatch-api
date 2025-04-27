@@ -170,25 +170,20 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": False,
     "SCHEMA_PATH_PREFIX": r"/api/v[0-9]",
     "COMPONENT_SPLIT_REQUEST": True,
-    # "SWAGGER_UI_SETTINGS": """{
-    #     deepLinking: true,
-    #     persistAuthorization: true,
-    #     displayOperationId: true,
-    #     urls: [
-    #         {url: "/api/v1/schema", name: "v1"},
-    #         {url: "/api/v2/schema", name: "v2"},
-    #     ],
-    #     presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
-    #     layout: "StandaloneLayout",
-    #     filter: true,
-    #     showExtensions: true,
-    #     showCommonExtensions: true,
-    #     syntaxHighlight: {
-    #         activated: true,
-    #     },
-    #     tagsSorter: 'alpha',
-    #     operationsSorter: 'alpha',
-    # }""",
+    "SWAGGER_UI_SETTINGS": """{
+        deepLinking: true,
+        persistAuthorization: true,
+        displayOperationId: true,
+        
+        presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+        layout: "StandaloneLayout",
+        filter: true,
+        syntaxHighlight: {
+            activated: true,
+        },
+        tagsSorter: 'alpha',
+        operationsSorter: 'alpha',
+    }""",
     # Configuración para versionado
     "VERSIONING_CLASS": "rest_framework.versioning.URLPathVersioning",
     "DEFAULT_VERSION": "v1",
