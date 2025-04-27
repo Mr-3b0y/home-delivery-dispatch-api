@@ -1,5 +1,5 @@
-from rest_framework_simplejwt.views import TokenRefreshView, TokenVerifyView
-from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiParameter
+from rest_framework_simplejwt.views import TokenRefreshView
+from drf_spectacular.utils import extend_schema_view, extend_schema
 
 
 

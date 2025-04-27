@@ -1,35 +1,46 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
+from django.contrib.auth.password_validation import validate_password
+from rest_framework.validators import UniqueValidator
 
-User = get_user_model()
+from apps.users.models import User
+
 
 class RegisterSerializer(serializers.ModelSerializer):
     """
     Serializer for user registration.
     """
-    password1 = serializers.CharField(write_only=True)
-    password2 = serializers.CharField(write_only=True)
+    email = serializers.EmailField(
+        required=True,
+        validators=[UniqueValidator(queryset=User.objects.all())]
+    )
+    password = serializers.CharField(
+        write_only=True,
+        required=True,
+        validators=[validate_password]
+    )
+    password2 = serializers.CharField(write_only=True, required=True)
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'first_name', 'last_name', 'password1', 'password2')
+        fields = ('username','email', 'password', 'password2', 'first_name', 'last_name')
         extra_kwargs = {
-            'password1': {'write_only': True},
-            'password2': {'write_only': True}
+            'first_name': {'required': True},
+            'last_name': {'required': True}
         }
-    
-    def validate(self, data):
-        """
-        Validate that both passwords match.
-        """
-        if data['password1'] != data['password2']:
-            raise serializers.ValidationError({"password2": "Passwords do not match."})
-        return data
-    
+
+    def validate(self, attrs):
+        if attrs['password'] != attrs['password2']:
+            raise serializers.ValidationError({"password": "Las contraseñas no coinciden."})
+        return attrs
+
     def create(self, validated_data):
-        validated_data.pop('password2')  # Remove password2 as it's just for validation
-        password = validated_data.pop('password1')
-        user = User(**validated_data)
-        user.set_password(password)
-        user.save()
-        return super().create(validated_data)
+        validated_data.pop('password2')
+        user = User.objects.create_user(**validated_data)
+        return user
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'email', 'first_name', 'last_name', 'date_joined')
+        read_only_fields = ('id', 'date_joined')
