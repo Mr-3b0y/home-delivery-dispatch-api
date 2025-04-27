@@ -12,7 +12,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'password1', 'password2')
+        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'password1', 'password2', 'phone_number', 'is_active', 'is_staff')
         read_only_fields = ('id',)
         
     def validate(self, data):
@@ -87,5 +87,5 @@ class UserDetailSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'is_active', 'is_staff', 'is_driver', 'is_client')
-        read_only_fields = ('id', 'is_active', 'is_staff', 'email', 'username', 'is_driver', 'is_client')
+        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'is_active', 'is_staff', 'date_joined', 'last_login', 'phone_number')
+        read_only_fields = ('id', 'is_active', 'is_staff', 'email', 'username', 'date_joined', 'last_login')

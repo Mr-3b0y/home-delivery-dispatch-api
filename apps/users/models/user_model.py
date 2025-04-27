@@ -37,8 +37,8 @@ class User(AbstractUser, PermissionsMixin):
     """
     Custom user model that extends the default Django user model.
     """
-    is_driver = models.BooleanField(default=False)
-    is_client = models.BooleanField(default=True)
+    phone_number = models.CharField(max_length=15, unique=True)
+    # is_driver = models.BooleanField(default=False)
     
     
     USERNAME_FIELD = 'username'

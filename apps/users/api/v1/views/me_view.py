@@ -7,15 +7,15 @@ from apps.users.api.v1.serializers import UserDetailSerializer
 
 @extend_schema_view(
     get=extend_schema(
-        tags=["User Authenticated"],
+        tags=["User Authenticated Information"],
         summary="Get user profile",
     ),
     put=extend_schema(
-        tags=["User Authenticated"],
+        tags=["User Authenticated Information"],
         summary="Update user profile",
     ),
     patch=extend_schema(
-        tags=["User Authenticated"],
+        tags=["User Authenticated Information"],
         summary="Partial update user profile",
     ),
 )

@@ -22,10 +22,16 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username','email', 'password', 'password2', 'first_name', 'last_name')
+        fields = ('username','email', 'password', 'password2', 'first_name', 'last_name', 'phone_number')
         extra_kwargs = {
             'first_name': {'required': True},
-            'last_name': {'required': True}
+            'last_name': {'required': True},
+            'phone_number': {'required': True},
+            'username': {'required': True},
+            'email': {'required': True},
+            'password': {'required': True},
+            'password2': {'required': True},
+            
         }
 
     def validate(self, attrs):
@@ -37,10 +43,3 @@ class RegisterSerializer(serializers.ModelSerializer):
         validated_data.pop('password2')
         user = User.objects.create_user(**validated_data)
         return user
-
-
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('id', 'email', 'first_name', 'last_name', 'date_joined')
-        read_only_fields = ('id', 'date_joined')
