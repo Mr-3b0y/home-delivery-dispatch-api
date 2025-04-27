@@ -25,6 +25,7 @@ urls_v1 = [
     path('auth/', include('apps.authentication.api.v1.urls')),
     path('drivers/', include('apps.drivers.api.v1.urls')),
     path('addresses/', include('apps.addresses.api.v1.urls')),
+    path('services/', include('apps.services.api.v1.urls')),
 ]
 
 urls_v2 = [

@@ -28,6 +28,7 @@ LOCAL_APPS = [
     'apps.authentication',
     'apps.drivers',
     'apps.addresses',
+    'apps.services',
 ]
 
 
