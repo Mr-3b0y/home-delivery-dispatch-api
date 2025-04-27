@@ -24,12 +24,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 LOCAL_APPS = [
     'apps.users',
+    'apps.authentication',
 ]
 
 
 THIRD_PARTY_APPS = [
     'rest_framework',
     'drf_spectacular',
+    'rest_framework_simplejwt',
 ]
 
 
@@ -145,8 +147,9 @@ REST_FRAMEWORK = {
     ),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.SessionAuthentication",
-        "rest_framework.authentication.BasicAuthentication",
+        # "rest_framework.authentication.SessionAuthentication",
+        # "rest_framework.authentication.BasicAuthentication",
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
@@ -167,25 +170,25 @@ SPECTACULAR_SETTINGS = {
     "SERVE_INCLUDE_SCHEMA": False,
     "SCHEMA_PATH_PREFIX": r"/api/v[0-9]",
     "COMPONENT_SPLIT_REQUEST": True,
-    "SWAGGER_UI_SETTINGS": """{
-        deepLinking: true,
-        persistAuthorization: true,
-        displayOperationId: true,
-        urls: [
-            {url: "/api/v1/schema", name: "v1"},
-            {url: "/api/v2/schema", name: "v2"},
-        ],
-        presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
-        layout: "StandaloneLayout",
-        filter: true,
-        showExtensions: true,
-        showCommonExtensions: true,
-        syntaxHighlight: {
-            activated: true,
-        },
-        tagsSorter: 'alpha',
-        operationsSorter: 'alpha',
-    }""",
+    # "SWAGGER_UI_SETTINGS": """{
+    #     deepLinking: true,
+    #     persistAuthorization: true,
+    #     displayOperationId: true,
+    #     urls: [
+    #         {url: "/api/v1/schema", name: "v1"},
+    #         {url: "/api/v2/schema", name: "v2"},
+    #     ],
+    #     presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+    #     layout: "StandaloneLayout",
+    #     filter: true,
+    #     showExtensions: true,
+    #     showCommonExtensions: true,
+    #     syntaxHighlight: {
+    #         activated: true,
+    #     },
+    #     tagsSorter: 'alpha',
+    #     operationsSorter: 'alpha',
+    # }""",
     # Configuración para versionado
     "VERSIONING_CLASS": "rest_framework.versioning.URLPathVersioning",
     "DEFAULT_VERSION": "v1",

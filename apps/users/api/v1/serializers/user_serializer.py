@@ -53,17 +53,6 @@ class UserSerializer(serializers.ModelSerializer):
         
         instance.save()
         return instance
-    
-class UserLoginSerializer(serializers.ModelSerializer):
-    """
-    Serializer for user login.
-    """
-    class Meta:
-        model = User
-        fields = ('username', 'password')
-        extra_kwargs = {
-            'password': {'write_only': True}
-        }
         
         
 class UserChangePasswordSerializer(serializers.Serializer):
@@ -98,5 +87,5 @@ class UserDetailSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = User
-        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'is_active', 'is_staff')
-        read_only_fields = ('id',)
+        fields = ('id', 'username', 'email', 'first_name', 'last_name', 'is_active', 'is_staff', 'is_driver', 'is_client')
+        read_only_fields = ('id', 'is_active', 'is_staff', 'email', 'username', 'is_driver', 'is_client')
