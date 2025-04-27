@@ -2,9 +2,8 @@ from django.apps import AppConfig
 from django.utils.translation import gettext_lazy as _
 
 
-class DriversConfig(AppConfig):
+class CoreConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
-    name = 'apps.drivers'
-    verbose_name = _('Drivers')
-    label = 'drivers'
-    
+    name = 'apps.core'
+    verbose_name = _('Core')
+    label = 'core'

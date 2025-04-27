@@ -23,6 +23,7 @@ from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, Spec
 urls_v1 = [
     path('users/', include('apps.users.api.v1.urls')),
     path('auth/', include('apps.authentication.api.v1.urls')),
+    path('drivers/', include('apps.drivers.api.v1.urls')),
 ]
 
 urls_v2 = [
