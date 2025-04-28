@@ -28,23 +28,19 @@ class DriverModelTest(TestCase):
             'is_available': True,
         }
         
-        # Crear el Driver directamente con todos los campos necesarios de User y Driver
+        # Create a test driver
         self.driver = Driver.objects.create_user(
-            username=self.user_data['username'],
-            email=self.user_data['email'],
-            password=self.user_data['password'],
-            first_name=self.user_data['first_name'],
-            last_name=self.user_data['last_name'],
-            phone_number=self.user_data['phone_number'],
-            vehicle_plate=self.driver_data['vehicle_plate'],
-            vehicle_model=self.driver_data['vehicle_model'],
-            vehicle_year=self.driver_data['vehicle_year'],
-            vehicle_color=self.driver_data['vehicle_color'],
-            current_latitude=self.driver_data['current_latitude'],
-            current_longitude=self.driver_data['current_longitude'],
-            is_available=self.driver_data['is_available']
+            **self.user_data,
         )
-        
+        self.driver.vehicle_plate = self.driver_data['vehicle_plate']
+        self.driver.vehicle_model = self.driver_data['vehicle_model']
+        self.driver.vehicle_year = self.driver_data['vehicle_year']
+        self.driver.vehicle_color = self.driver_data['vehicle_color']
+        self.driver.current_latitude = self.driver_data['current_latitude']
+        self.driver.current_longitude = self.driver_data['current_longitude']
+        self.driver.is_available = self.driver_data['is_available']
+        # Save the driver
+        self.driver.save()
         self.driver.refresh_from_db()
         
     def test_driver_creation(self):

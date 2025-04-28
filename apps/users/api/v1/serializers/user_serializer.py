@@ -7,8 +7,8 @@ class UserSerializer(serializers.ModelSerializer):
     """
     Serializer for the User model.
     """
-    password1 = serializers.CharField(write_only=True)
-    password2 = serializers.CharField(write_only=True)
+    password1 = serializers.CharField(write_only=True, required=False)
+    password2 = serializers.CharField(write_only=True, required=False)
 
     class Meta:
         model = User
@@ -17,10 +17,19 @@ class UserSerializer(serializers.ModelSerializer):
         
     def validate(self, data):
         """
-        Validate that both passwords match.
+        Validate that both passwords match if provided.
         """
-        if data['password1'] != data['password2']:
-            raise serializers.ValidationError({"password2": _("Passwords do not match.")})
+        # Solo verificar las contraseñas si ambas están presentes en los datos
+        if 'password1' in data and 'password2' in data:
+            if data['password1'] != data['password2']:
+                raise serializers.ValidationError({"password2": _("Passwords do not match.")})
+        
+        # Si solo una de las contraseñas está presente, es un error
+        elif 'password1' in data and 'password2' not in data:
+            raise serializers.ValidationError({"password2": _("Password confirmation required.")})
+        elif 'password2' in data and 'password1' not in data:
+            raise serializers.ValidationError({"password1": _("Password required.")})
+            
         return data
         
     def create(self, validated_data):
@@ -45,6 +54,7 @@ class UserSerializer(serializers.ModelSerializer):
         # Check if password is provided in the update
         password = validated_data.pop('password1', None)
         if password:
+            validated_data.pop('password2', None)  # Eliminar password2 si existe
             instance.set_password(password)
         
         # Update other fields

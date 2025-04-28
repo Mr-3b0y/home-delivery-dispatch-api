@@ -36,7 +36,7 @@ class UserViewSet(ModelViewSet):
     """
     ViewSet for managing users.
     """
-    queryset = User.objects.all()
+    queryset = User.objects.all().order_by('-date_joined')
     serializer_class = UserSerializer
     permission_classes = [permissions.IsAuthenticated, permissions.IsAdminUser]
     # lookup_field = 'username'

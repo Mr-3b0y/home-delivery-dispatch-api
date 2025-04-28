@@ -22,7 +22,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('username','email', 'password', 'password2', 'first_name', 'last_name', 'phone_number')
+        fields = ('username', 'email', 'password', 'password2', 'first_name', 'last_name', 'phone_number')
         extra_kwargs = {
             'first_name': {'required': True},
             'last_name': {'required': True},
@@ -31,12 +31,11 @@ class RegisterSerializer(serializers.ModelSerializer):
             'email': {'required': True},
             'password': {'required': True},
             'password2': {'required': True},
-            
         }
 
     def validate(self, attrs):
         if attrs['password'] != attrs['password2']:
-            raise serializers.ValidationError({"password": "Las contraseñas no coinciden."})
+            raise serializers.ValidationError({"password": "Passwords do not match."})
         return attrs
 
     def create(self, validated_data):

@@ -7,3 +7,4 @@ django-cors-headers==4.7.0
 drf-spectacular==0.28.0
 python-decouple==3.8
 psycopg2-binary==2.9.10
+Faker==37.1.0
