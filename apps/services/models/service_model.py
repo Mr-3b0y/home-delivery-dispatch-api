@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator
+from decimal import Decimal
 
 from common.db import BaseModel
 from apps.users.models import User
@@ -32,15 +33,15 @@ class Service(BaseModel):
                                       decimal_places=2,
                                       null=True,
                                       blank=True,
-                                      validators=[MinValueValidator(0)])
+                                      validators=[MinValueValidator(Decimal('0'))])
     estimated_arrival_minutes = models.PositiveIntegerField(null=True,
                                                             blank=True)
     
     
     class Meta:
+        app_label = 'services'
         verbose_name = _('Service')
         verbose_name_plural = _('Services')
         indexes = [
             models.Index(fields=['status']),
         ]
-        

@@ -1,4 +1,5 @@
 from django.test import TestCase
+from django.core.exceptions import ValidationError
 from decimal import Decimal
 
 from apps.users.models import User
@@ -42,14 +43,14 @@ class AddressModelTests(TestCase):
         
     def test_invalid_coordinates(self):
         """Test validation for invalid coordinates"""
-        # Latitude out of range
-        with self.assertRaises(Exception):
-            invalid_data = self.address_data.copy()
-            invalid_data['latitude'] = Decimal('91.0')
-            Address.objects.create(**invalid_data)
-
-        # Longitude out of range
-        with self.assertRaises(Exception):
-            invalid_data = self.address_data.copy()
-            invalid_data['longitude'] = Decimal('181.0')
-            Address.objects.create(**invalid_data)
+        # Test invalid latitude
+        address = Address(**self.address_data)
+        address.latitude = Decimal('91.0')
+        with self.assertRaises(ValidationError):
+            address.full_clean()
+            
+        # Test invalid longitude
+        address = Address(**self.address_data)
+        address.longitude = Decimal('181.0')
+        with self.assertRaises(ValidationError):
+            address.full_clean()

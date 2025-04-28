@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractUser, BaseUserManager, PermissionsMixin
 from django.core.validators import RegexValidator
 
@@ -50,6 +51,15 @@ class User(AbstractUser, PermissionsMixin):
     REQUIRED_FIELDS = ['email']
     
     objects = UserManager()
+    
+    class Meta:
+        app_label = 'users'
+        verbose_name = _('User')
+        verbose_name_plural = _('Users')
+        indexes = [
+            models.Index(fields=['username']),
+            models.Index(fields=['email']),
+        ]
 
     def __str__(self):
         return self.username

@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
+from decimal import Decimal
 
 from common.db import BaseModel
 from apps.users.models import User
@@ -33,12 +34,12 @@ class Address(BaseModel):
     latitude = models.DecimalField(
         max_digits=9,
         decimal_places=6,
-        validators=[MinValueValidator(-90), MaxValueValidator(90)]
+        validators=[MinValueValidator(Decimal('-90')), MaxValueValidator(Decimal('90'))]
     )
     longitude = models.DecimalField(
         max_digits=9, 
         decimal_places=6,
-        validators=[MinValueValidator(-180), MaxValueValidator(180)]
+        validators=[MinValueValidator(Decimal('-180')), MaxValueValidator(Decimal('180'))]
     )
     reference = models.TextField(null=True, blank=True)
     
@@ -47,6 +48,7 @@ class Address(BaseModel):
     
     
     class Meta:
+        app_label = 'addresses'
         verbose_name = _('Address')
         verbose_name_plural = _('Addresses')
         indexes = [

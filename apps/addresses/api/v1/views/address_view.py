@@ -52,7 +52,7 @@ class AddressViewSet(ModelViewSet):
     Regular users can only see and modify their own addresses.
     Admin users can see and modify all addresses.
     """
-    queryset = Address.objects.all()
+    queryset = Address.objects.all().order_by('id')
     serializer_class = AddressSerializer
     permission_classes = [IsAuthenticated, IsOwnerOrAdmin]
 

@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from apps.users.models import User
 from common.db import BaseModel
@@ -6,7 +7,9 @@ from math import radians, sin, cos, sqrt, atan2
 
 
 class Driver(User, BaseModel):
-    
+    """
+    Model representing a driver.
+    """
     vehicle_plate = models.CharField(max_length=20)
     vehicle_model = models.CharField(max_length=100)
     vehicle_year = models.PositiveIntegerField()
@@ -21,8 +24,9 @@ class Driver(User, BaseModel):
         return f"{self.user.username} - {self.vehicle_plate}"
     
     class Meta:
-        verbose_name = 'Driver'
-        verbose_name_plural = 'Drivers'
+        app_label = 'drivers'
+        verbose_name = _('Driver')
+        verbose_name_plural = _('Drivers')
         
         
     def calculate_distance(self, latitude, longitude):

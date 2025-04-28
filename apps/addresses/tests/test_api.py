@@ -29,7 +29,7 @@ class AddressAPITests(APITestCase):
             'longitude': '-74.005974',
             'reference': 'Near the park'
         }
-        self.url = '/api/v1/addresses/'
+        self.url = '/api/v1/addresses/addresses/'
 
     def test_create_address(self):
         """Test creating an address via API"""
@@ -64,7 +64,7 @@ class AddressAPITests(APITestCase):
         
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # Verificar que la respuesta contiene datos paginados
+        # Verify that the response contains paginated data
         self.assertIn('results', response.data)
         self.assertEqual(len(response.data['results']), 2)
         
