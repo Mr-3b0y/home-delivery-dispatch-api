@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager, PermissionsMixin
-
+from django.core.validators import RegexValidator
 
 
 class UserManager(BaseUserManager):
@@ -37,7 +37,12 @@ class User(AbstractUser, PermissionsMixin):
     """
     Custom user model that extends the default Django user model.
     """
-    phone_number = models.CharField(max_length=15, unique=True)
+    phone_number = models.CharField(max_length=15,
+                                    unique=True,
+                                    validators=[RegexValidator(r'^\+?1?\d{9,15}$')],
+                                    error_messages={
+                                        'unique': "A user with that phone number already exists.",  
+                                    })
     # is_driver = models.BooleanField(default=False)
     
     

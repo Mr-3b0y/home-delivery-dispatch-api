@@ -9,7 +9,7 @@ def get_closest_driver(drivers, pickup_address):
     closest_distance = float('inf')
 
     for driver in drivers:
-        distance = driver.calculate_distance(pickup_address)
+        distance = driver.calculate_distance(pickup_address.latitude, pickup_address.longitude)
         if distance < closest_distance:
             closest_distance = distance
             closest_driver = driver

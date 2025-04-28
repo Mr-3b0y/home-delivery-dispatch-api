@@ -10,11 +10,8 @@ from apps.addresses.models import Address
 
 class Service(BaseModel):
     STATUS_CHOICES = (
-        ('PENDING', 'Pending'),
-        ('ASSIGNED', 'Assigned'),
         ('IN_PROGRESS', 'In progress'),
         ('COMPLETED', 'Completed'),
-        ('CANCELLED', 'Cancelled'),
     )
     
     client = models.ForeignKey(User,
@@ -30,7 +27,7 @@ class Service(BaseModel):
                                        related_name='pickup_services')
     status = models.CharField(max_length=15,
                               choices=STATUS_CHOICES,
-                              default='PENDING')
+                              default='IN_PROGRESS')
     distance_km = models.DecimalField(max_digits=10,
                                       decimal_places=2,
                                       null=True,
@@ -38,8 +35,7 @@ class Service(BaseModel):
                                       validators=[MinValueValidator(0)])
     estimated_arrival_minutes = models.PositiveIntegerField(null=True,
                                                             blank=True)
-    cancellation_reason = models.TextField(null=True,
-                                           blank=True)
+    
     
     class Meta:
         verbose_name = _('Service')

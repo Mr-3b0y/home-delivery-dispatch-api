@@ -1,1 +1,1 @@
-from .service_serializer import ServiceSerializer, ServiceCancelSerializer
+from .service_serializer import ServiceSerializer

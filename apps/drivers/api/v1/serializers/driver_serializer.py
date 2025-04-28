@@ -72,7 +72,7 @@ class DriverRegistrationSerializer(serializers.ModelSerializer):
         driver.vehicle_color = validated_data['vehicle_color']
         driver.current_latitude = validated_data['current_latitude']
         driver.current_longitude = validated_data['current_longitude']
-        driver.is_available = validated_data['is_available']
+        driver.is_available = validated_data.get('is_available', True)
         driver.save()
         return driver
 
