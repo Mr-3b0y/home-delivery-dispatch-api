@@ -14,7 +14,3 @@ class DriverAdmin(admin.ModelAdmin):
     ordering = ('username',)
     readonly_fields = ('date_joined',)
     
-    def get_queryset(self, request):
-        """Override to include related fields."""
-        qs = super().get_queryset(request)
-        return qs.select_related('user')
