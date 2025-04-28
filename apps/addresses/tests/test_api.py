@@ -64,6 +64,8 @@ class AddressAPITests(APITestCase):
         
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # Verificar que la respuesta contiene datos paginados
+        self.assertIn('results', response.data)
         self.assertEqual(len(response.data['results']), 2)
         
     def test_unauthorized_access(self):

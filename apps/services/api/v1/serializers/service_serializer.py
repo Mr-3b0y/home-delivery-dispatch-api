@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 from apps.services.models import Service
 from apps.drivers.api.v1.serializers import DriverListSerializer
+from apps.users.api.v1.serializers import UserSerializer
 
 
 class ServiceSerializer(serializers.ModelSerializer):
@@ -12,6 +13,7 @@ class ServiceSerializer(serializers.ModelSerializer):
     """
     
     driver = DriverListSerializer(read_only=True)
+    client = UserSerializer(read_only=True)
     
     class Meta:
         model = Service
