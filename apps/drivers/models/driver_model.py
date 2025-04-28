@@ -21,7 +21,7 @@ class Driver(User, BaseModel):
     
     
     def __str__(self):
-        return f"{self.user.username} - {self.vehicle_plate}"
+        return f"{self.username} - {self.vehicle_plate}"
     
     class Meta:
         app_label = 'drivers'
