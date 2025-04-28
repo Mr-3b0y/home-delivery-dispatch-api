@@ -48,7 +48,7 @@ class ServiceViewSet(ModelViewSet):
     """
     ViewSet for the Service model.
     """
-    queryset = Service.objects.all()
+    queryset = Service.objects.all().order_by('-created_at')
     serializer_class = ServiceSerializer
     permission_classes = [IsAuthenticated, ServicePermission]
 
@@ -117,7 +117,7 @@ class ServiceViewSet(ModelViewSet):
         """
         service = self.get_object()
         
-        if service.status != 'In progress':
+        if service.status not in ['In progress', 'IN_PROGRESS']:
             return Response({"detail": "Service is not in progress."}, status=status.HTTP_400_BAD_REQUEST)
         
         service.status = 'COMPLETED'
