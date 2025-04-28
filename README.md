@@ -293,6 +293,6 @@ Este proyecto está licenciado bajo MIT.
 
 ## Contacto
 
-[Tu nombre] - [Tu correo electrónico]
+Telegram - @Mr_3b0y
 
 Enlace del proyecto: [https://github.com/Mr-3b0y/home-delivery-dispatch-api](https://github.com/Mr-3b0y/home-delivery-dispatch-api)
