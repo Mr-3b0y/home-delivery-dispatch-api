@@ -1,5 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 
 from common.db import BaseModel
 from apps.users.models import User
@@ -20,9 +21,25 @@ class Address(BaseModel):
     city = models.CharField(max_length=100)
     state = models.CharField(max_length=100)
     country = models.CharField(max_length=100)
-    postal_code = models.CharField(max_length=20)
-    latitude = models.DecimalField(max_digits=9, decimal_places=6)
-    longitude = models.DecimalField(max_digits=9, decimal_places=6)
+    postal_code = models.CharField(
+        max_length=20,
+        validators=[
+            RegexValidator(
+                regex=r'^[0-9a-zA-Z\s-]+$',
+                message=_('Enter a valid postal code. This value may contain only letters, numbers, spaces and hyphens.')
+            )
+        ]
+    )
+    latitude = models.DecimalField(
+        max_digits=9,
+        decimal_places=6,
+        validators=[MinValueValidator(-90), MaxValueValidator(90)]
+    )
+    longitude = models.DecimalField(
+        max_digits=9, 
+        decimal_places=6,
+        validators=[MinValueValidator(-180), MaxValueValidator(180)]
+    )
     reference = models.TextField(null=True, blank=True)
     
     def __str__(self):
@@ -32,5 +49,8 @@ class Address(BaseModel):
     class Meta:
         verbose_name = _('Address')
         verbose_name_plural = _('Addresses')
-    
-    
+        indexes = [
+            models.Index(fields=['city', 'state', 'country']),
+            models.Index(fields=['latitude', 'longitude']),
+        ]
+

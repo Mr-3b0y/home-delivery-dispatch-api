@@ -20,22 +20,21 @@ class AddressSerializer(serializers.ModelSerializer):
             'postal_code': {'required': True},
             'latitude': {'required': True},
             'longitude': {'required': True},
-            }
+        }
             
-        def validate(self, data):
-            """
-            Validate latitude and longitude coordinates.
-            """
-            latitude = data.get('latitude')
-            longitude = data.get('longitude')
-            
-            if latitude is not None and (latitude < -90 or latitude > 90):
-                raise ValidationError(_("Latitude must be between -90 and 90 degrees."))
-            
-            if longitude is not None and (longitude < -180 or longitude > 180):
-                raise ValidationError(_("Longitude must be between -180 and 180 degrees."))
-            
-            return data
+    def validate(self, data):
+        """
+        Validate latitude and longitude coordinates.
+        """
+        latitude = data.get('latitude')
+        longitude = data.get('longitude')
         
-    
-    
+        if latitude is not None and (latitude < -90 or latitude > 90):
+            raise ValidationError(_("Latitude must be between -90 and 90 degrees."))
+        
+        if longitude is not None and (longitude < -180 or longitude > 180):
+            raise ValidationError(_("Longitude must be between -180 and 180 degrees."))
+        
+        return data
+
+
