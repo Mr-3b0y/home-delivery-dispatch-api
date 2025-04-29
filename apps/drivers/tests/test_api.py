@@ -1,6 +1,7 @@
 from rest_framework.test import APITestCase
 from rest_framework import status
 from django.urls import reverse
+from django.contrib.gis.geos import Point
 from apps.drivers.models import Driver
 from apps.users.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -42,8 +43,10 @@ class DriverAPITestCase(APITestCase):
             'vehicle_model': 'Toyota Corolla',
             'vehicle_year': 2020,
             'vehicle_color': 'Blue',
-            'current_latitude': Decimal('37.7749'),
-            'current_longitude': Decimal('-122.4194'),
+            'location_coordinates': {
+                'type': 'Point',
+                'coordinates': [Decimal(-74.005974), Decimal(40.712776)]
+            },
             'is_available': True,
         }
         
@@ -78,8 +81,7 @@ class DriverAPITestCase(APITestCase):
             vehicle_model=self.driver_data['vehicle_model'],
             vehicle_year=self.driver_data['vehicle_year'],
             vehicle_color=self.driver_data['vehicle_color'],
-            current_latitude=self.driver_data['current_latitude'],
-            current_longitude=self.driver_data['current_longitude'],
+            location_coordinates=Point((-74.005974, 40.712776), srid=4326),
             is_available=self.driver_data['is_available']
         )
         
@@ -102,32 +104,28 @@ class DriverAPITestCase(APITestCase):
     def create_test_driver(self, username, **kwargs):
         """Helper to create a test driver with all required fields."""
         # Create a user first
-        user = User.objects.create_user(
-            username=username,
-            email=f'{username}@example.com',
-            password='password123',
-            phone_number=f'+1{username[-1]}222333444',
-            first_name=f'Test{username[-1]}',
-            last_name='Driver'
-        )
         
         # Create driver fields
         driver = Driver(
-            user_ptr_id=user.id,  # Use the same ID as the user
+            username=username,
+            email=f'{username}@example.com',
+            phone_number=f'+1{username[-1]}222333444',
+            first_name=f'Test{username[-1]}',
+            last_name='Driver',
             # Driver-specific fields with defaults
             vehicle_plate=kwargs.get('vehicle_plate', f'PLATE-{username}'),
             vehicle_model=kwargs.get('vehicle_model', 'Toyota Corolla'),
             vehicle_year=kwargs.get('vehicle_year', 2020),
             vehicle_color=kwargs.get('vehicle_color', 'Blue'),
-            current_latitude=kwargs.get('current_latitude', Decimal('37.7749')),
-            current_longitude=kwargs.get('current_longitude', Decimal('-122.4194')),
+            location_coordinates=kwargs.get('location_coordinates', Point((-84.005974, 42.712776), srid=4326)),
             is_available=kwargs.get('is_available', True)
         )
         
         # Save directly
+        driver.set_password('DriverTest1234*')  # Set password
         driver.save()
         
-        return Driver.objects.get(id=user.id)
+        return driver
         
     def get_auth_header(self, token):
         """Return the Authorization header with the given token."""
@@ -174,8 +172,10 @@ class DriverAPITestCase(APITestCase):
             'vehicle_model': 'Honda Civic',
             'vehicle_year': 2021,
             'vehicle_color': 'Red',
-            'current_latitude': '38.9072',
-            'current_longitude': '-77.0369',
+            'location_coordinates': {
+                'type': 'Point',
+                'coordinates': [Decimal(-73.935242), Decimal(40.730610)]
+            },
             'is_available': True,
         }
         

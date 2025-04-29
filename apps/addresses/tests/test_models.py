@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 from decimal import Decimal
+from django.contrib.gis.geos import Point
 
 from apps.users.models import User
 from apps.addresses.models import Address
@@ -22,8 +23,7 @@ class AddressModelTests(TestCase):
             'state': 'Test State',
             'country': 'Test Country',
             'postal_code': '12345',
-            'latitude': Decimal('40.712776'),
-            'longitude': Decimal('-74.005974'),
+            'coordinates': Point((-74.005974, 40.712776), srid=4326),
             'reference': 'Near the park',
             'created_by': self.user
         }
@@ -45,12 +45,7 @@ class AddressModelTests(TestCase):
         """Test validation for invalid coordinates"""
         # Test invalid latitude
         address = Address(**self.address_data)
-        address.latitude = Decimal('91.0')
+        address.coordinates = Point((Decimal('200.0'), Decimal('40.712776')), srid=4326)
         with self.assertRaises(ValidationError):
             address.full_clean()
             
-        # Test invalid longitude
-        address = Address(**self.address_data)
-        address.longitude = Decimal('181.0')
-        with self.assertRaises(ValidationError):
-            address.full_clean()

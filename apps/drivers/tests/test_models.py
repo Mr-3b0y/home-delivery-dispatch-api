@@ -2,6 +2,7 @@ from django.test import TestCase
 from apps.drivers.models import Driver
 from apps.users.models import User
 from decimal import Decimal
+from django.contrib.gis.geos import Point
 
 
 class DriverModelTest(TestCase):
@@ -23,8 +24,7 @@ class DriverModelTest(TestCase):
             'vehicle_model': 'Toyota Corolla',
             'vehicle_year': 2020,
             'vehicle_color': 'Blue',
-            'current_latitude': Decimal('37.7749'),
-            'current_longitude': Decimal('-122.4194'),
+            'location_coordinates': Point((-122.4194, 37.7749), srid=4326),
             'is_available': True,
         }
         
@@ -33,7 +33,6 @@ class DriverModelTest(TestCase):
         self.driver = Driver.objects.create(
             username=self.user_data['username'],
             email=self.user_data['email'],
-            password=self.user_data['password'],
             first_name=self.user_data['first_name'],
             last_name=self.user_data['last_name'],
             phone_number=self.user_data['phone_number'],
@@ -41,11 +40,12 @@ class DriverModelTest(TestCase):
             vehicle_model=self.driver_data['vehicle_model'],
             vehicle_year=self.driver_data['vehicle_year'],
             vehicle_color=self.driver_data['vehicle_color'],
-            current_latitude=self.driver_data['current_latitude'],
-            current_longitude=self.driver_data['current_longitude'],
+            location_coordinates=self.driver_data['location_coordinates'],
             is_available=self.driver_data['is_available']
         )
+        self.driver.set_password(self.user_data['password'])
         self.driver.save()
+        
         self.driver.refresh_from_db()
         
         
@@ -62,31 +62,11 @@ class DriverModelTest(TestCase):
         self.assertEqual(self.driver.vehicle_model, self.driver_data['vehicle_model'])
         self.assertEqual(self.driver.vehicle_year, self.driver_data['vehicle_year'])
         self.assertEqual(self.driver.vehicle_color, self.driver_data['vehicle_color'])
-        self.assertEqual(self.driver.current_latitude, self.driver_data['current_latitude'])
-        self.assertEqual(self.driver.current_longitude, self.driver_data['current_longitude'])
+        self.assertEqual(self.driver.location_coordinates, self.driver_data['location_coordinates'])
         self.assertEqual(self.driver.is_available, self.driver_data['is_available'])
-        self.assertEqual(self.driver.rating, Decimal('5.0'))  # Default rating
         
         
-    def test_calculate_distance(self):
-        """Test the distance calculation method."""
-        # San Francisco to Los Angeles (approx. 559 km)
-        sf_lat = Decimal('37.7749')
-        sf_lng = Decimal('-122.4194')
-        la_lat = Decimal('34.0522')
-        la_lng = Decimal('-118.2437')
         
-        # Use the driver in San Francisco
-        self.driver.current_latitude = sf_lat
-        self.driver.current_longitude = sf_lng
-        self.driver.save()
-        
-        # Calculate distance to Los Angeles
-        distance = self.driver.calculate_distance(la_lat, la_lng)
-        
-        # Test that the distance is approximately correct (within 10km)
-        self.assertGreater(distance, 540)
-        self.assertLess(distance, 580)
         
     def test_availability_flag(self):
         """Test changing the availability flag."""

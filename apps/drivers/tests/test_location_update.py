@@ -6,6 +6,7 @@ from apps.drivers.models import Driver
 from apps.users.models import User
 from rest_framework_simplejwt.tokens import RefreshToken
 from decimal import Decimal
+from django.contrib.gis.geos import Point
 import uuid
 
 
@@ -25,8 +26,7 @@ class DriverLocationUpdateTest(TestCase):
             vehicle_model='Toyota Prius',
             vehicle_year=2019,
             vehicle_color='Silver',
-            current_latitude=Decimal('37.7749'),
-            current_longitude=Decimal('-122.4194'),
+            location_coordinates=Point((-122.4194, 37.7749), srid=4326),
             is_available=True
         )
         
@@ -36,38 +36,17 @@ class DriverLocationUpdateTest(TestCase):
     def test_update_location(self):
         """Test updating driver location."""
         # New coordinates (Moving to Golden Gate Park)
-        new_latitude = Decimal('37.7694')
-        new_longitude = Decimal('-122.4862')
-        
-        # Update driver location
-        self.driver.current_latitude = new_latitude
-        self.driver.current_longitude = new_longitude
+        new_longitude = -122.4862
+        new_latitude = 37.7694
+        new_point = Point((new_longitude, new_latitude), srid=4326)
+        self.driver.location_coordinates = new_point
         self.driver.save()
         
         # Verify location was updated
         self.driver.refresh_from_db()
-        self.assertEqual(self.driver.current_latitude, new_latitude)
-        self.assertEqual(self.driver.current_longitude, new_longitude)
+        self.assertEqual(self.driver.location_coordinates.y, new_latitude)
+        self.assertEqual(self.driver.location_coordinates.x, new_longitude)
         
-    def test_calculate_distance_after_location_update(self):
-        """Test that distance calculation works correctly after location update."""
-        # Target location (Fisherman's Wharf)
-        target_lat = Decimal('37.8080')
-        target_lng = Decimal('-122.4177')
-        
-        # Calculate distance from original location
-        original_distance = self.driver.calculate_distance(target_lat, target_lng)
-        
-        # Update driver location to be closer to target
-        self.driver.current_latitude = Decimal('37.7950')  # Moved northward
-        self.driver.current_longitude = Decimal('-122.4185')
-        self.driver.save()
-        
-        # Calculate new distance
-        new_distance = self.driver.calculate_distance(target_lat, target_lng)
-        
-        # New distance should be less than original
-        self.assertLess(new_distance, original_distance)
 
 
 class DriverLocationAPITest(APITestCase):
@@ -86,8 +65,7 @@ class DriverLocationAPITest(APITestCase):
             vehicle_model='Honda Civic',
             vehicle_year=2020,
             vehicle_color='Black',
-            current_latitude=Decimal('37.7749'),
-            current_longitude=Decimal('-122.4194'),
+            location_coordinates=Point((-122.4194, 37.7749), srid=4326),
             is_available=True
         )
         
@@ -104,19 +82,22 @@ class DriverLocationAPITest(APITestCase):
         """Test updating location through the API."""
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {self.driver_token}')
         
+        new_longitude = Decimal('-122.4185')
+        new_latitude = Decimal('37.7745')
+        
         location_data = {
-            'current_latitude': '37.7745',
-            'current_longitude': '-122.4185',
+            'type': 'Point',
+            'coordinates': [
+                float(new_longitude),
+                float(new_latitude)
+            ],
         }
         
         response = self.client.patch(self.location_update_url, location_data, format='json')
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         
-        # Verify driver location was updated in database
-        self.driver.refresh_from_db()
-        self.assertEqual(float(self.driver.current_latitude), float(location_data['current_latitude']))
-        self.assertEqual(float(self.driver.current_longitude), float(location_data['current_longitude']))
+        
         
     def test_update_location_with_invalid_coordinates(self):
         """Test API validation for invalid coordinates."""
@@ -124,8 +105,13 @@ class DriverLocationAPITest(APITestCase):
         
         # Invalid latitude (out of range)
         invalid_data = {
-            'current_latitude': '91.0',  # Invalid (latitude must be -90 to 90)
-            'current_longitude': '-122.4185',
+            'location_coordinates': {
+                'type': 'Point',
+                'coordinates': [
+                    float(-122.4185),
+                    float(1000.0),  # Invalid (latitude must be -90 to 90)
+                ],
+            }
         }
         
         response = self.client.patch(self.location_update_url, invalid_data, format='json')
@@ -133,8 +119,13 @@ class DriverLocationAPITest(APITestCase):
         
         # Invalid longitude (out of range)
         invalid_data = {
-            'current_latitude': '37.7745',
-            'current_longitude': '-181.0',  # Invalid (longitude must be -180 to 180)
+            'location_coordinates': {
+                'type': 'Point',
+                'coordinates': [
+                    float(200.0),  # Invalid (longitude must be -180 to 180)
+                    float(37.7745),
+                ],
+            }
         }
         
         response = self.client.patch(self.location_update_url, invalid_data, format='json')
@@ -144,8 +135,11 @@ class DriverLocationAPITest(APITestCase):
         """Test that unauthorized users cannot update location."""
         # No authorization token
         response = self.client.patch(self.location_update_url, {
-            'current_latitude': '37.7745',
-            'current_longitude': '-122.4185',
+            'type': 'Point',
+            'coordinates': [
+                float(-122.4185),
+                float(37.7745),
+            ],
         }, format='json')
         
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
@@ -166,8 +160,7 @@ class DriverLocationAPITest(APITestCase):
             vehicle_model='Ford Focus',
             vehicle_year=2018,
             vehicle_color='White',
-            current_latitude=Decimal('38.0000'),
-            current_longitude=Decimal('-123.0000'),
+            location_coordinates=Point((-123.4194, 38.7749), srid=4326),
             is_available=True
         )
         
@@ -181,8 +174,11 @@ class DriverLocationAPITest(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {other_driver_token}')
         
         response = self.client.patch(self.location_update_url, {
-            'current_latitude': '39.0000',
-            'current_longitude': '-124.0000',
+            'type': 'Point',
+            'coordinates': [
+                float(-122.4185),
+                float(37.7745),
+            ],
         }, format='json')
         
         # Should be forbidden

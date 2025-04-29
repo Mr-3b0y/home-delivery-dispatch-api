@@ -37,7 +37,6 @@ class Service(BaseModel):
     estimated_arrival_minutes = models.PositiveIntegerField(null=True,
                                                             blank=True)
     
-    
     class Meta:
         app_label = 'services'
         verbose_name = _('Service')

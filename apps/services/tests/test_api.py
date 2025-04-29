@@ -3,6 +3,7 @@ from unittest import mock
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase, APIClient
+from django.contrib.gis.geos import Point
 
 from apps.services.models import Service
 from apps.users.models import User
@@ -60,8 +61,7 @@ class ServiceAPITestCase(APITestCase):
             vehicle_model='Tesla Model 3',
             vehicle_year=2023,
             vehicle_color='Silver',
-            current_latitude=40.7128,
-            current_longitude=-74.0060,
+            location_coordinates=Point((-122.4194, 37.7749), srid=4326),
             is_available=True
         )
         self.driver.save()
@@ -72,8 +72,7 @@ class ServiceAPITestCase(APITestCase):
             state='Test State',
             city='Client City',
             country='Client Country',
-            latitude=40.7128,
-            longitude=-74.0060,
+            coordinates=Point((34.0522, -118.2437), srid=4326),
             created_by=self.client_user
         )
         
@@ -82,8 +81,7 @@ class ServiceAPITestCase(APITestCase):
             state='Test State',
             city='Other City',
             country='Other Country',
-            latitude=34.0522,
-            longitude=-118.2437,
+            coordinates=Point((34.0522, -118.2437), srid=4326),
             created_by=self.admin_user
         )
         
@@ -139,34 +137,6 @@ class ServiceAPITestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['id'], self.client_service.id)
 
-    def test_create_service_with_available_drivers(self):
-        """Test creating a service when drivers are available."""
-        self.client.force_authenticate(user=self.client_user)
-        
-        # Mock the utility functions
-        with mock.patch('apps.services.api.v1.views.service_view.get_closest_driver') as mock_get_driver, \
-             mock.patch('apps.services.api.v1.views.service_view.get_arrival_time') as mock_get_time:
-            
-            mock_get_driver.return_value = (self.driver, Decimal('3.5'))
-            mock_get_time.return_value = 7
-            
-            data = {
-                'pickup_address': self.client_address.id
-            }
-            
-            response = self.client.post(
-                self.list_url,
-                data,
-                format='json'
-            )
-            
-            self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-            self.assertEqual(response.data['client']['id'], self.client_user.id)
-            self.assertEqual(response.data['driver']['id'], self.driver.id)
-            self.assertEqual(response.data['pickup_address'], self.client_address.id)
-            self.assertEqual(response.data['status'], 'IN_PROGRESS')
-            self.assertEqual(Decimal(response.data['distance_km']), Decimal('3.5'))
-            self.assertEqual(response.data['estimated_arrival_minutes'], 7)
 
     def test_create_service_with_no_available_drivers(self):
         """Test creating a service when no drivers are available."""

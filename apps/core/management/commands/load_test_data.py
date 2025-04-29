@@ -1,6 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.core.management import call_command
 from django.db import transaction
+from django.contrib.gis.geos import Point
 from faker import Faker
 from decouple import config
 
@@ -65,14 +66,14 @@ class Command(BaseCommand):
                 # Creating addresses for user
                 self.stdout.write(self.style.NOTICE(f'Creating addresses for user {user.username}...'))
                 for j in range(3):
+                    lat, lon = map(float, fake.latlng())
                     address = Address.objects.create(
                         street=fake.street_address(),
                         city=fake.city(),
                         state=fake.state(),
                         country=fake.country(),
                         postal_code=fake.postcode(),
-                        latitude=fake.coordinate(),
-                        longitude=fake.longitude(),
+                        coordinates = Point((lat, lon), srid=4326),
                         created_by=user,
                     )
                     self.stdout.write(self.style.SUCCESS(f'  - Address {j+1}/3 created: {address.street}'))
@@ -90,6 +91,7 @@ class Command(BaseCommand):
         for i in range(30):
             phone = '+' + str(fake.random_int(min=1000000000, max=9999999999))
             try:
+                lat, lon = map(float, fake.latlng())
                 driver = Driver(
                     username=fake.user_name(),
                     email=fake.email(),
@@ -100,8 +102,9 @@ class Command(BaseCommand):
                     vehicle_model=fake.random_element(elements=vehicle_types_brands),
                     vehicle_color=fake.color_name(),
                     vehicle_year=fake.random_int(min=2000, max=2023),
-                    current_latitude=float(fake.latitude()),
-                    current_longitude=float(fake.longitude()),
+                    location_coordinates=Point(
+                        (lat, lon), srid=4326
+                    ),
                     is_available=fake.boolean(chance_of_getting_true=70),
                 )
                 driver.set_password(driver_password)  # Aquí encriptas la contraseña correctamente
