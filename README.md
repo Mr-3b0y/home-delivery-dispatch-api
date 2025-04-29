@@ -101,12 +101,12 @@ La documentación interactiva de la API está disponible en:
 
 La API expone los siguientes endpoints principales:
 
-- `/api/v1/register/`: Registro de usuarios
-- `/api/v1/token/`: Obtención de tokens JWT
-- `/api/v1/me/`: Información del usuario autenticado
-- `/api/v1/driver/`: Gestión de conductores
-- `/api/v1/address/`: Gestión de direcciones
-- `/api/v1/service/`: Gestión de servicios
+- `/api/v1/users/register/`: Registro de usuarios
+- `/api/v1/auth/login/`: Obtención de tokens JWT
+- `/api/v1/users/me/`: Información del usuario autenticado
+- `/api/v1/drivers/drivers/`: Gestión de conductores
+- `/api/v1/addresses/addresses/`: Gestión de direcciones
+- `/api/v1/services/services/`: Gestión de servicios
 
 ## Desarrollo Local
 
