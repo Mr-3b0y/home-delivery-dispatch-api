@@ -13,6 +13,15 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     no_proxy="localhost,127.0.0.1" \
     NO_PROXY="localhost,127.0.0.1"
 
+# Instala dependencias del sistema necesarias
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    libpq-dev \
+    gdal-bin \
+    binutils \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
 # Define directorio de trabajo
 WORKDIR /app
 

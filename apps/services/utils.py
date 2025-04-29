@@ -16,11 +16,16 @@ def get_closest_driver(drivers, pickup_address):
 
     return closest_driver, closest_distance
 
-def get_arrival_time(distance_km):
+def get_arrival_time(distance_km: float, average_speed_kmh: float = 60.0) -> int:
     """
-    Calculate the estimated arrival time based on distance.
-    Assuming an average speed of 60 km/h.
+    Calcula el tiempo estimado de llegada en minutos, redondeado al entero más cercano.
+    
+    :param distance_km: Distancia en kilómetros.
+    :param average_speed_kmh: Velocidad promedio en km/h. Por defecto 60 km/h.
+    :return: Tiempo estimado de llegada en minutos (int).
     """
-    average_speed_kmh = 60
-    estimated_arrival_minutes = (distance_km / average_speed_kmh) * 60
-    return estimated_arrival_minutes
+    if average_speed_kmh <= 0:
+        raise ValueError("La velocidad promedio debe ser mayor que cero.")
+    
+    estimated_minutes = (distance_km / average_speed_kmh) * 60
+    return round(estimated_minutes)
