@@ -2,6 +2,7 @@ from decimal import Decimal
 from django.test import TestCase
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
+from django.contrib.gis.geos import Point
 
 from apps.services.models import Service
 from apps.users.models import User
@@ -50,8 +51,7 @@ class ServiceModelTestCase(TestCase):
             vehicle_model='Toyota Corolla',
             vehicle_year=2022,
             vehicle_color='White',
-            current_latitude=40.7128,
-            current_longitude=-74.0060,
+            location_coordinates=Point((-122.4194, 37.7749), srid=4326),
             is_available=True
         )
         self.driver.save()
@@ -62,8 +62,7 @@ class ServiceModelTestCase(TestCase):
             state='Test State',
             city='Test City',
             country='Test Country',
-            latitude=40.7128,
-            longitude=-74.0060,
+            coordinates=Point((-122.4194, 37.7749), srid=4326),
             created_by=self.client_user
         )
 

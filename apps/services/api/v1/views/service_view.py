@@ -4,6 +4,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action
 from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiParameter, OpenApiResponse
+from django.contrib.gis.measure import D
+from django.contrib.gis.db.models.functions import Distance
 
 from apps.services.models import Service
 from apps.services.api.v1.serializers import ServiceSerializer
@@ -80,15 +82,19 @@ class ServiceViewSet(ModelViewSet):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         
-        drivers_availables = Driver.objects.filter(is_available=True)
         pickup_address = serializer.validated_data.get('pickup_address')
-        if not drivers_availables.exists():
+        
+        closest_driver = Driver.objects.filter(is_available=True) \
+            .annotate(distance=Distance('location_coordinates', pickup_address.coordinates)) \
+            .order_by('distance').first()
+        
+        if not closest_driver:
             return Response({
                 "detail": "No drivers are currently available to fulfill your service request. Please try again later.",
             }, status=status.HTTP_404_NOT_FOUND)
         
-        closest_driver, closest_distance = get_closest_driver(drivers_availables, pickup_address)
-        estimated_arrival_minutes = get_arrival_time(closest_distance)
+        closest_distance = closest_driver.distance.km
+        estimated_arrival_minutes = get_arrival_time(closest_distance) 
         
         serializer.save(driver=closest_driver,
                         client=self.request.user,

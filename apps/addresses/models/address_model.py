@@ -1,13 +1,17 @@
-from django.db import models
+# from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
+from django.core.exceptions import ValidationError
 from decimal import Decimal
+from django.contrib.gis.db import models
+from django.db.models import Manager as GeoManager
+
 
 from common.db import BaseModel
 from apps.users.models import User
 
 
-class Address(BaseModel):
+class Address(models.Model):
     """
     Model representing an address.
     """
@@ -31,17 +35,15 @@ class Address(BaseModel):
             )
         ]
     )
-    latitude = models.DecimalField(
-        max_digits=9,
-        decimal_places=6,
-        validators=[MinValueValidator(Decimal('-90')), MaxValueValidator(Decimal('90'))]
-    )
-    longitude = models.DecimalField(
-        max_digits=9, 
-        decimal_places=6,
-        validators=[MinValueValidator(Decimal('-180')), MaxValueValidator(Decimal('180'))]
-    )
+    coordinates = models.PointField(geography=True,
+                                    srid=4326, db_index=True)
     reference = models.TextField(null=True, blank=True)
+    
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    objects = GeoManager()
     
     def __str__(self):
         return f"{self.street}, {self.city}, {self.state}, {self.country}, {self.postal_code}"
@@ -53,6 +55,16 @@ class Address(BaseModel):
         verbose_name_plural = _('Addresses')
         indexes = [
             models.Index(fields=['city', 'state', 'country']),
-            models.Index(fields=['latitude', 'longitude']),
         ]
 
+
+    def clean(self):
+        """
+        Custom validation for the Address model.
+        """
+        if self.coordinates:
+            lat, lon = self.coordinates.coords
+            if not (-90 <= lat <= 90):
+                raise ValidationError(_('Latitude must be between -90 and 90 degrees.'))
+            if not (-180 <= lon <= 180):
+                raise ValidationError(_('Longitude must be between -180 and 180 degrees.'))
