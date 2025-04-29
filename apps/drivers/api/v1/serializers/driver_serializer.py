@@ -40,6 +40,23 @@ class DriverRegistrationSerializer(serializers.ModelSerializer):
             
         }
         
+    def validate_location_coordinates(self, value):
+        """
+        Validate that location_coordinates contains valid geographic coordinates.
+        """
+        if value is None:
+            raise serializers.ValidationError("Location coordinates are required.")
+        if hasattr(value, 'x') and hasattr(value, 'y'):
+            # Longitude (x) must be between -180 and 180
+            if not (-180 <= value.x <= 180):
+                raise serializers.ValidationError("Longitude must be between -180 and 180 degrees.")
+                
+            # Latitude (y) must be between -90 and 90
+            if not (-90 <= value.y <= 90):
+                raise serializers.ValidationError("Latitude must be between -90 and 90 degrees.")
+                
+        return value
+        
     def validate(self, attrs):
         """
         Validate the input data.

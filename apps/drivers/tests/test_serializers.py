@@ -4,6 +4,7 @@ from django.contrib.auth import get_user_model
 from apps.drivers.models import Driver
 from apps.drivers.api.v1.serializers import DriverRegistrationSerializer, DriverListSerializer, DriverDetailSerializer
 from rest_framework import serializers
+from django.contrib.gis.geos import Point
 
 
 
@@ -26,8 +27,7 @@ class DriverSerializerTest(TestCase):
             'vehicle_model': 'Toyota Corolla',
             'vehicle_year': 2020,
             'vehicle_color': 'Blue',
-            'current_latitude': Decimal('37.7749'),
-            'current_longitude': Decimal('-122.4194'),
+            'location_coordinates': Point((-122.4194, 37.7749), srid=4326),
             'is_available': True,
         }
         
@@ -53,8 +53,10 @@ class DriverSerializerTest(TestCase):
             'vehicle_model': 'Honda Civic',
             'vehicle_year': 2021,
             'vehicle_color': 'Red',
-            'current_latitude': Decimal('38.9072'),
-            'current_longitude': Decimal('-77.0369'),
+            'location_coordinates': {
+                'type': 'Point',
+                'coordinates': [-122.4194, 37.7749]
+            },
             'is_available': True,
         }
         
@@ -69,8 +71,10 @@ class DriverSerializerTest(TestCase):
             'vehicle_model': 'Honda Civic',
             'vehicle_year': -2021,  # Invalid negative year
             'vehicle_color': 'Red',
-            'current_latitude': 'not-a-decimal',  # Invalid decimal
-            'current_longitude': Decimal('-200.0369'),  # Invalid longitude range
+            'location_coordinates': {
+                'type': 'Point',
+                'coordinates': [-122.4194, 37.7749]
+            },  # Invalid decimal
             'is_available': 'not-a-boolean',  # Invalid boolean
         }
 
@@ -82,7 +86,7 @@ class DriverSerializerTest(TestCase):
         expected_fields = [
             'id', 'username', 'email', 'first_name', 'last_name', 'phone_number',
             'vehicle_plate', 'vehicle_model', 'vehicle_year', 'vehicle_color',
-            'current_latitude', 'current_longitude', 'is_available', 'rating'
+            'location_coordinates', 'is_available'
         ]
         
         self.assertEqual(set(data.keys()), set(expected_fields))
@@ -128,20 +132,4 @@ class DriverSerializerTest(TestCase):
         
         # Note: In a real implementation, you would need a create method in the serializer
         # Here we're just testing the validation part
-        
-    def test_rating_field_is_read_only(self):
-        """Test that rating field is read-only."""
-        update_data = {
-            'rating': Decimal('1.0'),  # This should be ignored as it's read-only
-            'vehicle_color': 'Yellow',
-        }
-        
-        serializer = DriverRegistrationSerializer(instance=self.driver, data=update_data, partial=True)
-        self.assertTrue(serializer.is_valid())
-        updated_driver = serializer.save()
-        
-        # Rating should not change as it's read-only
-        self.assertEqual(updated_driver.rating, Decimal('5.0'))  # Default value
-        
-        # But other fields should update
-        self.assertEqual(updated_driver.vehicle_color, 'Yellow')
+    

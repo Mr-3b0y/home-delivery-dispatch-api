@@ -2,6 +2,7 @@ from django.test import TestCase
 from rest_framework.test import APITestCase, APIClient
 from rest_framework import status
 from decimal import Decimal
+from django.contrib.gis.geos import Point
 
 from apps.users.models import User
 from apps.addresses.models import Address
@@ -25,8 +26,10 @@ class AddressAPITests(APITestCase):
             'state': 'Test State',
             'country': 'Test Country',
             'postal_code': '12345',
-            'latitude': '40.712776',
-            'longitude': '-74.005974',
+            'coordinates': {
+                'type': 'Point',
+                'coordinates': [Decimal('-74.005974'), Decimal('40.712776')]
+            },
             'reference': 'Near the park'
         }
         self.url = '/api/v1/addresses/addresses/'
@@ -47,8 +50,7 @@ class AddressAPITests(APITestCase):
             state='Test State',
             country='Test Country',
             postal_code='12345',
-            latitude=Decimal('40.712776'),
-            longitude=Decimal('-74.005974'),
+            coordinates=Point((-74.005974, 40.712776), srid=4326),
             created_by=self.user
         )
         Address.objects.create(
@@ -57,8 +59,7 @@ class AddressAPITests(APITestCase):
             state='Another State',
             country='Another Country',
             postal_code='67890',
-            latitude=Decimal('41.712776'),
-            longitude=Decimal('-75.005974'),
+            coordinates=Point((-75.005974, 41.712776), srid=4326),
             created_by=self.user
         )
         

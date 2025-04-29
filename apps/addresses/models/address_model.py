@@ -1,6 +1,7 @@
 # from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
+from django.core.exceptions import ValidationError
 from decimal import Decimal
 from django.contrib.gis.db import models
 from django.db.models import Manager as GeoManager
@@ -56,3 +57,14 @@ class Address(models.Model):
             models.Index(fields=['city', 'state', 'country']),
         ]
 
+
+    def clean(self):
+        """
+        Custom validation for the Address model.
+        """
+        if self.coordinates:
+            lat, lon = self.coordinates.coords
+            if not (-90 <= lat <= 90):
+                raise ValidationError(_('Latitude must be between -90 and 90 degrees.'))
+            if not (-180 <= lon <= 180):
+                raise ValidationError(_('Longitude must be between -180 and 180 degrees.'))

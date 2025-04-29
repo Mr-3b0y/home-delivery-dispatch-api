@@ -1,6 +1,7 @@
 from django.test import TestCase
 from rest_framework.test import APIRequestFactory
 from rest_framework.views import APIView
+from django.contrib.gis.geos import Point
 
 from apps.services.models import Service
 from apps.users.models import User
@@ -78,8 +79,7 @@ class ServicePermissionTestCase(TestCase):
             vehicle_model='Mercedes Benz',
             vehicle_year=2022,
             vehicle_color='Black',
-            current_latitude=40.7128,
-            current_longitude=-74.0060,
+            location_coordinates=Point((-122.4194, 37.7749), srid=4326),
             is_available=True
         )
         self.driver.save()
@@ -100,8 +100,7 @@ class ServicePermissionTestCase(TestCase):
             vehicle_model='BMW X5',
             vehicle_year=2021,
             vehicle_color='White',
-            current_latitude=40.7330,
-            current_longitude=-74.0060,
+            location_coordinates=Point((-122.4194, 37.7749), srid=4326),
             is_available=True
         )
         self.other_driver.save()
@@ -112,8 +111,7 @@ class ServicePermissionTestCase(TestCase):
             state='Test State',
             city='Test City',
             country='Test Country',
-            latitude=40.7128,
-            longitude=-74.0060,
+            coordinates=Point((-122.4194, 37.7749), srid=4326),
             created_by=self.client_user
         )
         
